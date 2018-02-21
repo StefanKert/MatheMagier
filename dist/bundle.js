@@ -17255,7 +17255,6 @@ var Game = /** @class */ (function (_super) {
     function Game(props) {
         var _this = _super.call(this, props) || this;
         _this.state = Game.initialState();
-        console.log(_this.state);
         return _this;
     }
     Game.initialState = function () {
@@ -17297,7 +17296,6 @@ var Game = /** @class */ (function (_super) {
         this.setState(Game.initialState());
     };
     Game.prototype.selectNumber = function (clickedNumber) {
-        console.log("State", this.state);
         if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) {
             return;
         }
@@ -17354,7 +17352,7 @@ var Game = /** @class */ (function (_super) {
     Game.prototype.render = function () {
         var _a = this.state, selectedNumbers = _a.selectedNumbers, randomNumberOfStars = _a.randomNumberOfStars, answerIsCorrect = _a.answerIsCorrect, usedNumbers = _a.usedNumbers, redraws = _a.redraws, doneStatus = _a.doneStatus;
         return (React.createElement("div", { className: "container col-4" },
-            React.createElement("h3", null, "Play Nine"),
+            React.createElement("h3", null, "Mathe-Magier"),
             React.createElement("hr", null),
             React.createElement("div", { className: "row" },
                 React.createElement(Stars_1.Stars, { numberOfStars: randomNumberOfStars }),
