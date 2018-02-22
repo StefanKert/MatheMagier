@@ -1,36 +1,39 @@
-import * as React from "react";
-import * as _ from "lodash";
+import * as React from 'react';
+import * as _ from 'lodash';
 
-import { Stars } from "./Stars";
-import { Button } from "./Button";
-import { Numbers } from "./Numbers";
-import { DoneFrame } from "./DoneFrame";
-import { Answer } from "./Answer";
-import { inherits } from "util";
+import { Stars } from './Stars';
+import { Button } from './Button';
+import { Numbers } from './Numbers';
+import { DoneFrame } from './DoneFrame';
+import { Answer } from './Answer';
+import { Timer } from './Timer';
+import { StartTimerButton } from './StartTimerButtonProps';
 
-export interface GameProps {
+export interface GameState {
     selectedNumbers: number[];
     usedNumbers: number[];
     answerIsCorrect: boolean;
     randomNumberOfStars: number;
     redraws: number;
     doneStatus: string;
+    timerStarted: boolean;
 }
 
-export class Game extends React.Component<any, GameProps> {
-    static randomNumber = () => 1 + Math.floor((Math.random() * 9))
-    static initialState(): GameProps {
+export class Game extends React.Component<{}, GameState> {
+    static randomNumber = () => 1 + Math.floor((Math.random() * 9));
+    static initialState(): GameState {
         return {
             selectedNumbers: [],
             randomNumberOfStars: Game.randomNumber(),
-            answerIsCorrect: null,
+            answerIsCorrect: false,
             usedNumbers: [],
             redraws: 5,
-            doneStatus: null
+            doneStatus: '',
+            timerStarted: false
         };
     }
 
-    constructor(props: any) {
+    constructor(props: {}) {
         super(props);
         this.state = Game.initialState();
     }
@@ -42,7 +45,7 @@ export class Game extends React.Component<any, GameProps> {
             arr.pop();
             return this.possibleCombinationSum(arr, n);
         }
-        var listSize = arr.length, combinationsCount = (1 << listSize)
+        var listSize = arr.length, combinationsCount = (1 << listSize);
         for (var i = 1; i < combinationsCount; i++) {
             var combinationSum = 0;
             for (var j = 0; j < listSize; j++) {
@@ -53,90 +56,102 @@ export class Game extends React.Component<any, GameProps> {
         return false;
     }
 
-    resetGame() {
+    resetGame = () => {
         this.setState(Game.initialState());
     }
 
-    selectNumber(clickedNumber: number) {
+    selectNumber = (clickedNumber: number) => {
         if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) {
             return;
         }
 
-        this.setState((prevState: GameProps) => ({
-            answerIsCorrect: null,
-            selectedNumbers: prevState.selectedNumbers.concat(clickedNumber)
+        this.setState((prevState: GameState) => ({
+            answerIsCorrect: false,
+            selectedNumbers: prevState.selectedNumbers.concat(clickedNumber),
         }));
     }
 
-    unselectNumber(clickedNumber: number) {
-        this.setState((prevState: GameProps) => ({
-            answerIsCorrect: null,
-            selectedNumbers: prevState.selectedNumbers.filter(number => number !== clickedNumber)
+    unselectNumber = (clickedNumber: number) => {
+        this.setState((prevState: GameState) => ({
+            answerIsCorrect: false,
+            selectedNumbers: prevState.selectedNumbers.filter(num => num !== clickedNumber)
         }));
     }
 
-    checkAnswer() {
-        this.setState((prevState: GameProps) => ({
+    checkAnswer = () => {
+        this.setState((prevState: GameState) => ({
             answerIsCorrect: prevState.randomNumberOfStars === prevState.selectedNumbers.reduce((acc, n) => acc + n, 0)
         }));
     }
 
-    acceptAnswer() {
-        this.setState((prevState: GameProps) => ({
+    acceptAnswer = () => {
+        this.setState((prevState: GameState) => ({
             usedNumbers: prevState.usedNumbers.concat(prevState.selectedNumbers),
             selectedNumbers: [],
-            answerIsCorrect: null,
+            answerIsCorrect: false,
             randomNumberOfStars: Game.randomNumber(),
         }), this.updateDoneStatus);
     }
 
-    redraw() {
+    redraw = () => {
         if (this.state.redraws === 0) {
             return;
         }
 
-        this.setState((prevState: GameProps) => ({
+        this.setState((prevState: GameState) => ({
             selectedNumbers: [],
-            answerIsCorrect: null,
+            answerIsCorrect: false,
             randomNumberOfStars: Game.randomNumber(),
-            redraws: prevState.redraws - 1
+            redraws: (prevState.redraws - 1)
         }), this.updateDoneStatus);
     }
 
-    possibleSolutions(state: GameProps) {
-        const possibleNumbers = _.range(1, 10).filter(number => state.usedNumbers.indexOf(number) === -1);
+    possibleSolutions(state: GameState) {
+        const possibleNumbers = _.range(1, 10).filter(num => state.usedNumbers.indexOf(num) === -1);
         return this.possibleCombinationSum(possibleNumbers, state.randomNumberOfStars);
     }
 
     updateDoneStatus() {
-        this.setState((prevState: GameProps) => {
+        this.setState((prevState: GameState) => {
             if (prevState.usedNumbers.length === 9) {
                 return { doneStatus: 'Done. nice!' };
             }
             if (prevState.redraws === 0 && !this.possibleSolutions(prevState)) {
-                return { doneStatus: 'Game Over!' }
+                return { doneStatus: 'Game Over!' };
             }
-        })
+
+            return { doneStatus: '' };
+        });
+    }
+
+    startTimer = () => {
+        this.setState((prevState: GameState) => ({
+            timerStarted: true
+        }));
     }
 
     render() {
-        const { selectedNumbers, randomNumberOfStars, answerIsCorrect, usedNumbers, redraws, doneStatus } = this.state;
+        const { selectedNumbers, randomNumberOfStars, answerIsCorrect, usedNumbers, redraws, doneStatus, timerStarted } = this.state;
 
         return (
-            <div className="container col-4">
+            <div className="container col-sm-10 col-md-8 col-lg-6">
                 <h3>Mathe-Magier</h3>
                 <hr />
                 <div className="row">
                     <Stars numberOfStars={randomNumberOfStars} />
-                    <Button selectedNumbers={selectedNumbers} redraws={redraws} redraw={this.redraw.bind(this)} acceptAnswer={this.acceptAnswer.bind(this)} checkAnswer={this.checkAnswer.bind(this)} answerIsCorrect={answerIsCorrect} />
-                    <Answer selectedNumbers={selectedNumbers} unselectNumber={this.unselectNumber.bind(this)} />
+                    <Button selectedNumbers={selectedNumbers} redraws={redraws} redraw={this.redraw} acceptAnswer={this.acceptAnswer} checkAnswer={this.checkAnswer} answerIsCorrect={answerIsCorrect} />
+                    <Answer selectedNumbers={selectedNumbers} unselectNumber={this.unselectNumber} />
+                    {timerStarted ?
+                        <Timer start={new Date()} /> :
+                        <StartTimerButton startTimer={this.startTimer} />
+                    }
                 </div>
                 <br />
                 {doneStatus ?
-                    <DoneFrame resetGame={this.resetGame.bind(this)} doneStatus={doneStatus} /> :
-                    <Numbers selectedNumbers={selectedNumbers} usedNumbers={usedNumbers} selectNumber={this.selectNumber.bind(this)} />
+                    <DoneFrame resetGame={this.resetGame} doneStatus={doneStatus} /> :
+                    <Numbers selectedNumbers={selectedNumbers} usedNumbers={usedNumbers} selectNumber={this.selectNumber} />
                 }
             </div>
-        )
+        );
     }
 }

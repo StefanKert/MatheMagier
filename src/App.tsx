@@ -1,7 +1,6 @@
-import * as React from "react";
-import * as _ from "lodash";
+import * as React from 'react';
 
-import { Game } from "./Game";
+import { Game } from './components/Game';
 
 export class App extends React.Component {
     render() {
@@ -9,6 +8,6 @@ export class App extends React.Component {
             <div>
                 <Game />
             </div>
-        )
+        );
     }
 }
