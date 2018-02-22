@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export interface ButtonProps {
-    answerIsCorrect: boolean;
+    answerIsCorrect: boolean | null;
     selectedNumbers: number[];
     redraws: number;
     redraw(): void;

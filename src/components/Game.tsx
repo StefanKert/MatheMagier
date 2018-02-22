@@ -12,7 +12,7 @@ import { StartTimerButton } from './StartTimerButtonProps';
 export interface GameState {
     selectedNumbers: number[];
     usedNumbers: number[];
-    answerIsCorrect: boolean;
+    answerIsCorrect: boolean | null;
     randomNumberOfStars: number;
     redraws: number;
     doneStatus: string;
@@ -25,7 +25,7 @@ export class Game extends React.Component<{}, GameState> {
         return {
             selectedNumbers: [],
             randomNumberOfStars: Game.randomNumber(),
-            answerIsCorrect: false,
+            answerIsCorrect: null,
             usedNumbers: [],
             redraws: 5,
             doneStatus: '',
@@ -66,14 +66,14 @@ export class Game extends React.Component<{}, GameState> {
         }
 
         this.setState((prevState: GameState) => ({
-            answerIsCorrect: false,
+            answerIsCorrect: null,
             selectedNumbers: prevState.selectedNumbers.concat(clickedNumber),
         }));
     }
 
     unselectNumber = (clickedNumber: number) => {
         this.setState((prevState: GameState) => ({
-            answerIsCorrect: false,
+            answerIsCorrect: null,
             selectedNumbers: prevState.selectedNumbers.filter(num => num !== clickedNumber)
         }));
     }
@@ -88,7 +88,7 @@ export class Game extends React.Component<{}, GameState> {
         this.setState((prevState: GameState) => ({
             usedNumbers: prevState.usedNumbers.concat(prevState.selectedNumbers),
             selectedNumbers: [],
-            answerIsCorrect: false,
+            answerIsCorrect: null,
             randomNumberOfStars: Game.randomNumber(),
         }), this.updateDoneStatus);
     }
@@ -100,7 +100,7 @@ export class Game extends React.Component<{}, GameState> {
 
         this.setState((prevState: GameState) => ({
             selectedNumbers: [],
-            answerIsCorrect: false,
+            answerIsCorrect: null,
             randomNumberOfStars: Game.randomNumber(),
             redraws: (prevState.redraws - 1)
         }), this.updateDoneStatus);
